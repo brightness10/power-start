@@ -1,7 +1,7 @@
 // To Do
 // Add resize img task
 // Solve browserSync external url problem
-// check if possible to convert to scss
+// fix convert to scss
 
 // Steps
 // Change browserSync proxy
@@ -22,6 +22,7 @@ var gulp = require('gulp'),
     del = require('del'),
     sourcemaps = require('gulp-sourcemaps'),
     concat = require('gulp-concat'),
+    sassConvert = require('sass-convert'),
     sass = require('gulp-sass'),
     postcss = require('gulp-postcss'),
     autoprefixer = require('gulp-autoprefixer'),
@@ -66,6 +67,20 @@ gulp.task('css', function() {
           }))
         .pipe(autoprefixer({browsers: ['last 2 versions']}))
         .pipe(gulp.dest(styleDest));
+});
+
+// Convert sass to scss
+gulp.task('convert-scss', function(){
+    gulp.src(styleSrc)
+    .pipe(plumber())
+    .pipe(sassConvert({
+        from: 'sass',
+        to: 'scss'
+    }))
+    .pipe(rename({
+        extname: '.scss'
+    }))
+    .pipe(gulp.dest('test/'));
 });
 
 // Img tasks

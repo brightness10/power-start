@@ -6,6 +6,7 @@
 # Delete after cloning ---
 build/
 src/img/*
+!src/img/demo.jpg
 # /Delete after cloning ---
 
 

@@ -2,7 +2,15 @@
 # Created by https://www.gitignore.io/api/osx,node
 
 ### Project specific ###
+
+# Delete after cloning ---
 build/
+src/img/*
+# /Delete after cloning ---
+
+
+
+
 
 ### Node ###
 # Logs

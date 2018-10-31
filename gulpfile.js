@@ -1,13 +1,14 @@
 // To Do
-// add jpg, svg and gif to compress-img task
-// add resize img task
+// Add resize img task
 // Solve browserSync external url problem
 // check if possible to convert to scss
 
 // Steps
 // Change browserSync proxy
 // Change sass to scss if needed
+// להוסיף יו גדולה אחרי הפי הגדולה בסוף של המפתח של הטייני אם אין
 // verify paths are correct
+// Decide wether jpeg should be interlaced (progressive: true) or baselined
 
 
 // --------------------------------------------
@@ -17,17 +18,21 @@ var gulp = require('gulp'),
     plugins = require('gulp-load-plugins')(),
     plumber = require('gulp-plumber'),
     browserSync = require('browser-sync').create(),
-    del = require('del'),
     rename = require('gulp-rename'),
+    del = require('del'),
     sourcemaps = require('gulp-sourcemaps'),
-    sass = require('gulp-sass'),
-    autoprefixer = require('gulp-autoprefixer'),
-    postcss = require('gulp-postcss'),
     concat = require('gulp-concat'),
+    sass = require('gulp-sass'),
+    postcss = require('gulp-postcss'),
+    autoprefixer = require('gulp-autoprefixer'),
     uglify = require('gulp-uglify'),
+    tinify = require('gulp-tinify'),
     imagemin = require('gulp-imagemin'),
     imageminWebp = require('imagemin-webp'),
-    imageminPngquant = require('imagemin-pngquant');
+    imageminPngquant = require('imagemin-pngquant'),
+    imageminSvgo = require('imagemin-svgo'),
+    imageminGifsicle = require('imagemin-gifsicle'),
+    imageminMozjpeg = require('imagemin-mozjpeg');
 
 
 // paths
@@ -65,25 +70,46 @@ gulp.task('css', function() {
 
 // Img tasks
 
+// tinypng, limited amount of compressions so only use before deployment! 
+gulp.task('tiny', function(){
+    gulp.src(picSrc)
+    .pipe(tinify('Q3QHK5qkFewGcF0GCEPiG2WFXNWB7dPU'))
+    .pipe(gulp.dest(imgDest));
+});
+
 // Compress media - png/jpg/gif/svg
 gulp.task('compress-img', function() {
     gulp.src(imgSrc)
         .pipe(plumber())
-        .pipe(imagemin([imageminPngquant({
+        .pipe(imagemin([
+            imageminPngquant({
             quality: '70-90', // When used more then 70 the image wasn't saved
             speed: 1, // The lowest speed of optimization with the highest quality
             floyd: 1 // Controls level of dithering (0 = none, 1 = full).
-        })]))
+            }),
+            imageminMozjpeg({
+                quality: 90
+            }),
+            imageminSvgo({
+                removeViewBox: false
+            }),
+            imageminGifsicle({
+                interlaced: true,
+                optimizationLevel: 3
+            })
+        ]))
         .pipe(gulp.dest(imgDest));
 });
 
 // Convert png & jpg to webp
 gulp.task('convert-img', function(){
     gulp.src(picSrc)
-    .pipe(imagemin([imageminWebp({
+    .pipe(imagemin([
+        imageminWebp({
         quality: 100,
         method: 6 // slowest speed for optimal quality and size
-    })]))
+        })
+    ]))
     .pipe(rename({
         extname: '.webp'
     }))
